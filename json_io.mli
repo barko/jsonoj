@@ -20,15 +20,11 @@
   The default is [false] and a [Json_type.Json_error] exception
   is raised if an int is too big.
 
-  If [recursive] is true, then all JSON values are accepted rather
-  than just arrays and objects as specified by the standard.
-  The default is [false].
 *)
 val json_of_string : 
   ?allow_comments:bool ->
   ?allow_nan:bool ->
   ?big_int_mode:bool ->
-  ?recursive:bool -> 
   string -> Json_type.t
 
 (** [string_of_json] converts JSON data to a string.
@@ -43,6 +39,12 @@ val json_of_string :
 *)
 val string_of_json :
   ?allow_nan: bool ->
-  ?recursive:bool ->
   Json_type.t -> string
 
+
+(** [escpae_json_string add_string add_char s] returns an escaped json string.
+
+    [add_string] and [add_char] are functions that write a string and char 
+    to some destination 
+*)
+val escape_json_string : (string -> unit) -> (char -> unit) -> string -> unit
