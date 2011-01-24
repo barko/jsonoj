@@ -1,0 +1,4 @@
+description = "JSON data format"
+requires = "netstring"
+archive(byte)    = "jsonwheel.cma"
+archive(native)  = "jsonwheel.cmxa"

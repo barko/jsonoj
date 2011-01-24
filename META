@@ -1,0 +1,6 @@
+name = "json-wheel"
+version = "1.0.6"
+description = "JSON data format"
+requires = "netstring"
+archive(byte)    = "jsonwheel.cma"
+archive(native)  = "jsonwheel.cmxa"
