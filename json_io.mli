@@ -31,60 +31,6 @@ val json_of_string :
   ?recursive:bool -> 
   string -> Json_type.t
 
-(** Same as [Json_io.json_of_string] but the argument is a file
-  to read from. *)
-val load_json : 
-  ?allow_comments:bool ->
-  ?allow_nan:bool ->
-  ?big_int_mode:bool ->
-  ?recursive:bool -> 
-  string -> Json_type.t
-
-(** Conversion of JSON data to compact text. *)
-module Compact :
-sig
-  (** Generic printing function without superfluous space. 
-    See the standard [Format] module
-    for how to create and use formatters. 
-
-    In general, {!Json_io.string_of_json} and 
-    {!Json_io.save_json} are more convenient.
-  *)
-  val print : 
-    ?allow_nan: bool ->
-    ?recursive:bool ->
-    Format.formatter -> Json_type.t -> unit
-end
-
-(** Conversion of JSON data to compact text, optimized for speed. *)
-module Fast :
-sig
-  (** This function is faster than the one provided by the
-    {!Json_io.Compact} submodule but it is less generic and is subject to
-    the 16MB size limit of strings on 32-bit architectures. *)
-  val print : 
-    ?allow_nan: bool ->
-    ?recursive:bool ->
-    Buffer.t -> Json_type.t -> unit
-end
-
-
-(** Conversion of JSON data to indented text. *)
-module Pretty :
-sig
-  (** Generic pretty-printing function. 
-    See the standard [Format] module
-    for how to create and use formatters.
-    
-    In general, {!Json_io.string_of_json} and 
-    {!Json_io.save_json} are more convenient.
-  *)
-  val print : 
-    ?allow_nan: bool ->
-    ?recursive:bool ->
-    Format.formatter -> Json_type.t -> unit
-end
-
 (** [string_of_json] converts JSON data to a string.
 
   By default, the output is indented. If the [compact] flag is set to true,
@@ -97,15 +43,6 @@ end
 *)
 val string_of_json :
   ?allow_nan: bool ->
-  ?compact:bool ->
   ?recursive:bool ->
   Json_type.t -> string
 
-(** [save_json] works like {!Json_io.string_of_json} but 
-  saves the results directly into the file specified by the
-  argument of type string. *)
-val save_json : 
-  ?allow_nan:bool -> 
-  ?compact:bool -> 
-  ?recursive:bool ->
-  string -> Json_type.t -> unit
