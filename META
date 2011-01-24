@@ -1,6 +1,6 @@
-name = "json-wheel"
-version = "1.0.6"
-description = "JSON data format"
-requires = "netstring"
-archive(byte)    = "jsonwheel.cma"
-archive(native)  = "jsonwheel.cmxa"
+name = "jsonoj"
+version = "1.0.0"
+description = "a json parser and printer for ocamljs, which does not use Javascript's eval"
+requires = "javascript"
+archive(js) = "jsonoj.cmjsa"
+
