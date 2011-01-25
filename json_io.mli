@@ -42,9 +42,14 @@ val string_of_json :
   Json_type.t -> string
 
 
-(** [escpae_json_string add_string add_char s] returns an escaped json string.
+(** [escape_json_string add_string add_char s] returns an escaped json string.
 
     [add_string] and [add_char] are functions that write a string and char 
     to some destination 
 *)
 val escape_json_string : (string -> unit) -> (char -> unit) -> string -> unit
+
+(** [string_of_json_float ~allow_nan f] stringifies [f] according to
+    the JSON specificationsince [Pervasives.string_of_float] does not
+    have the right properites. *)
+val string_of_json_float : ?allow_nan:bool -> float -> string

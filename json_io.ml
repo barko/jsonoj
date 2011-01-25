@@ -132,7 +132,7 @@ let rec bprint_json allow_nan buf = function
     Buffer.add_string buf (string_of_int i)
 
   | Float f -> 
-    Buffer.add_string buf (string_of_json_float allow_nan f)
+    Buffer.add_string buf (string_of_json_float ~allow_nan f)
 
   | String s -> 
     bquote_json_string buf s
@@ -161,7 +161,7 @@ and bprint_pair allow_nan buf (key, x) =
 (* json does not allow rendering floats with a trailing dot: that is,
    1234. is not allowed, but 1234.0 is ok.  here, we add a '0' if
    string_of_int result in a trailing dot *)
-and string_of_json_float allow_nan f =
+and string_of_json_float ?(allow_nan=false) f =
   match classify_float f with
     | FP_nan -> 
       if allow_nan then "NaN"
