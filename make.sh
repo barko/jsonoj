@@ -21,7 +21,7 @@ function do_make () {
 }
 
 function do_clean () {
-    rm -rf *.cmi *.cmjs json_lexer.ml json_parser.ml json_parser.mli 
+    rm -rf *.cmi *.cmjs *.cmjsa json_lexer.ml json_parser.ml json_parser.mli 
 }
 
 case $1 in
