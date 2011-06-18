@@ -1,4 +1,4 @@
-This is an [ocamljs](http://github.com/jaked/ocamljs) library for
+This is a [js_of_ocaml](http://ocsigen.org/js_of_ocaml) library for
 parsing and printing json.  Although Javascript's eval is available
 for parsing, jsonoj does not use it.
 
