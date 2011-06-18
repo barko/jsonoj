@@ -1,6 +1,7 @@
 name = "jsonoj"
-version = "1.0.0"
-description = "a json parser and printer for ocamljs, which does not use Javascript's eval"
-requires = "javascript"
-archive(js) = "jsonoj.cmjsa"
+version = "1.1"
+description = "a json parser and printer for js_of_ocaml, which does not use Javascript's eval"
+requires = "js_of_ocaml js_of_ocaml.syntax"
+archive(byte) = "jsonoj.cma"
+archive(native) = "jsonoj.cmxa"
 

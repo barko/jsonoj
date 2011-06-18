@@ -29,8 +29,19 @@
       if big_int_mode then STRING s
       else json_error (s ^ " is too large for OCaml's type int, sorry")
 
-  let utf8_of_point i =
-    Javascript.Js_string.fromCharCode i
+  (* taken from js_of_ocaml's deriving_Json_lexer.mll *)
+  let utf8_of_bytes buf a b c d =
+    let i = (a lsl 12) lor (b lsl 8) lor (c lsl 4) lor d in
+    if i < 0x80 then
+      Buffer.add_char buf (Char.chr i)
+    else if i < 0x800 then begin
+      Buffer.add_char buf (Char.chr (0xc0 lor ((i lsr 6) land 0x1f)));
+      Buffer.add_char buf (Char.chr (0x80 lor (i land 0x3f)))
+    end else (* i < 0x10000 *) begin
+      Buffer.add_char buf (Char.chr (0xe0 lor ((i lsr 12) land 0xf)));
+      Buffer.add_char buf (Char.chr (0x80 lor ((i lsr 6) land 0x3f)));
+      Buffer.add_char buf (Char.chr (0x80 lor (i land 0x3f)))
+    end
 
   let custom_error descr lexbuf =
     json_error 
@@ -129,11 +140,11 @@ and escaped_char = parse
   | 'n'  { "\n" }
   | 'r'  { "\r" }
   | 't'  { "\t" }
-  | 'u' (hex hex hex hex as x) { let i = 0x1000 * hexval x.[0] +
-					 0x100 * hexval x.[1] +
-					 0x10 * hexval x.[2] + 
-					 hexval x.[3] in
-				 utf8_of_point i }
+  | 'u' (hex as a) (hex as b) (hex as c) (hex as d) { 
+      let buf = Buffer.create 5 in
+      utf8_of_bytes buf (Char.code a) (Char.code b) (Char.code c) (Char.code d);
+      Buffer.contents buf
+    }
   | _  { lexer_error "Invalid escape sequence" lexbuf }
 
 and comment = parse
