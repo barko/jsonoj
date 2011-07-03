@@ -2,6 +2,7 @@ name = "jsonoj"
 version = "1.1"
 description = "a json parser and printer for js_of_ocaml, which does not use Javascript's eval"
 requires = "js_of_ocaml js_of_ocaml.syntax"
+requires(syntax) = "js_of_ocaml.syntax"
 archive(byte) = "jsonoj.cma"
 archive(native) = "jsonoj.cmxa"
 
