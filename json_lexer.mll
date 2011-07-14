@@ -10,11 +10,11 @@
   (* Detection of the encoding from the 4 first characters of the data *)
   let detect_encoding c1 c2 c3 c4 =
     match c1, c2, c3, c4 with
-	'\000', '\000', '\000', _ -> `UTF32BE 
-      | '\000', _, '\000', _ -> `UTF16BE
-      | _, '\000', '\000', '\000' -> `UTF32LE 
-      | _, '\000', _, '\000' -> `UTF16LE 
-      | _ -> `UTF8
+      | '\000', '\000', '\000', _      -> `UTF32BE 
+      | '\000', _     , '\000', _      -> `UTF16BE
+      | _     , '\000', '\000', '\000' -> `UTF32LE 
+      | _     , '\000', _     , '\000' -> `UTF16LE 
+      | _                              -> `UTF8
 
   let hexval c =
     match c with
@@ -87,13 +87,20 @@ let hex = [ '0'-'9' 'a'-'f' 'A'-'F' ]
 let unescaped = ['\x20'-'\x21' '\x23'-'\x5B' '\x5D'-'\xFF' ]
 
 rule token p = parse
-  | "//"[^'\n']* { if p.allow_comments then 
-		     token p lexbuf
-		   else lexer_error "Comments are not allowed: " lexbuf }
-  | "/*"         { if p.allow_comments then 
-		     (comment lexbuf; 
-		      token p lexbuf)
-		   else lexer_error "Comments are not allowed: " lexbuf }
+  | "//"[^'\n']* { 
+      if p.allow_comments then 
+	token p lexbuf
+      else 
+        lexer_error "Comments are not allowed: " lexbuf 
+    }
+  | "/*" { 
+      if p.allow_comments then (
+        comment lexbuf; 
+	token p lexbuf
+      )
+      else 
+        lexer_error "Comments are not allowed: " lexbuf 
+    }
   | '{'     { OBJSTART }
   | '}'     { OBJEND }
   | '['     { ARSTART }
@@ -103,13 +110,29 @@ rule token p = parse
   | "true"  { BOOL true }
   | "false" { BOOL false }
   | "null"  { NULL }
-  | "NaN"   { if p.allow_nan then FLOAT nan
-	      else lexer_error "NaN values are not allowed: " lexbuf }
-  | "Infinity" { if p.allow_nan then FLOAT infinity
-		 else lexer_error "Infinite values are not allowed: " lexbuf }
-  | "-Infinity" { if p.allow_nan then FLOAT neg_infinity
-		  else lexer_error "Infinite values are not allowed: " lexbuf }
-  | '"'     { STRING (string [] lexbuf) }
+  | "NaN"   { 
+      if p.allow_nan then 
+        FLOAT nan
+      else 
+        lexer_error "NaN values are not allowed: " lexbuf 
+    }
+  | "Infinity" { 
+      if p.allow_nan then 
+        FLOAT infinity
+      else 
+        lexer_error "Infinite values are not allowed: " lexbuf 
+    }
+  | "-Infinity" { 
+      if p.allow_nan then 
+        FLOAT neg_infinity
+      else 
+        lexer_error "Infinite values are not allowed: " lexbuf 
+    }
+  | '"' { 
+      let l = ref [] in
+      while string l lexbuf do () done;
+      STRING (String.concat "" (List.rev !l)) 
+    }
   | int     { make_int p.big_int_mode (lexeme lexbuf) }
   | float   { FLOAT (float_of_string (lexeme lexbuf)) }
   | "\n"    { newline lexbuf; token p lexbuf }
@@ -119,11 +142,9 @@ rule token p = parse
 
 
 and string l = parse
-    '"'         { String.concat "" (List.rev l) }
-  | '\\'        { let s = escaped_char lexbuf in
-		    string (s :: l) lexbuf }
-  | unescaped+  { let s = lexeme lexbuf in
-		       string (s :: l) lexbuf }
+    '"'         { false }
+  | '\\'        { let s = escaped_char lexbuf in l := s :: !l; true }
+  | unescaped+  { let s = lexeme lexbuf in l := s :: !l; true }
   | _ as c      { custom_error 
 		    (sprintf "Unescaped control character \\u%04X or \
                               unterminated string" (int_of_char c))
@@ -132,7 +153,7 @@ and string l = parse
 
 
 and escaped_char = parse 
-    '"'
+  | '"'
   | '\\'
   | '/'  { lexeme lexbuf }
   | 'b'  { "\b" }
